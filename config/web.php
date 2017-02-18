@@ -56,7 +56,6 @@ $config = [
                         'POST signup' => 'signup',
                         'POST signin' => 'signin',
                         'POST changePassword' => 'changepassword',
-
                     ],
                 ],
             ],
