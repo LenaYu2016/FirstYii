@@ -87,14 +87,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public static function create($username,$psd){
         $customer = new User();
         $customer->username =  $username;
-        $customer->password = sha1($psd);
+        $customer->password = Yii::$app->getSecurity()->generatePasswordHash($psd);
         $customer->token=Yii::$app->getSecurity()->generateRandomString(20);
         $customer->save(false);
         return $customer;
     }
     public static function auth($username,$password){
         if($user=self::findByUsername($username)){
-            if($user->password===sha1($password)){
+            if($user->password===Yii::$app->getSecurity()->generatePasswordHash($password)){
                 $user->token=Yii::$app->getSecurity()->generateRandomString(20);
                 $user->save();
                 return ['message'=>'sign in success!!!','token'=>$user->token,'username'=>$user->username];
@@ -104,7 +104,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return ['error'=>'Username doesn\'t exist.Please sign up first.'];
     }
     public function resetPassword($password){
-        $this->password=sha1($password);
+        $this->password=Yii::$app->getSecurity()->generatePasswordHash($password);
         $this->save();
     }
 }
