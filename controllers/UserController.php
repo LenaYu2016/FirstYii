@@ -32,7 +32,7 @@ class UserController extends ActiveController
         $request = Yii::$app->request;
         $password=$request->post('password');
         $username=$request->post('username');
-        return $this->check('signup',compact('username','password'))? $this->createUser($request):
+        return $this->check('signup',compact('username','password'))? $this->createUser($password,$username):
             ['error'=>'username or password can\'t be empty,and password\'s length must be greater than 6,and username\' length must be between 3 and 20.'];
     }
     public function actionSignin(){
@@ -40,7 +40,7 @@ class UserController extends ActiveController
         $password=$request->post('password');
         $username=$request->post('username');
         return $this->check('signin',compact('username','password'))?
-            User::auth($request->post('username'),$request->post('password')):
+            User::auth($username,$password):
             ['error'=>'Username or password can\'t be empty,and password\'s length must be greater than 6,and username\' length must be between 3 and 20.'];
     }
     public function actionChangepassword(){
@@ -48,11 +48,11 @@ class UserController extends ActiveController
         $password=$request->post('password');
         $secret=$request->post('token');
           return $this->check('changePassword',compact('secret','password'))?
-              $this->reset($request->post('token'),['password'=>$request->post('password')]):
+              $this->reset($request->post('token'),compact('password')):
               ['error'=>'token or new password can\'t be empty,and password\'s length must be greater than 6.'];
     }
-   public function createUser($request){
-       $customer=User::create($request->post('username'),$request->post('password'));
+   public function createUser($password,$username){
+       $customer=User::create($username,$password);
        return ['message'=>'sign up successfully!!!','token'=>$customer->token,'username'=>$customer->username];
    }
     public function check($type,$fields){
