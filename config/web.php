@@ -7,6 +7,35 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
+        'response' => [
+            'class' => 'yii\web\Response',
+            'on beforeSend' => function ($event) {
+                $response = $event->sender;
+                $data=$response->data;
+                if (!isset($data['error'])) {
+                   if(isset($data['auth error'])){
+                       $response->data = [
+                           'success' => !$response->isSuccessful,
+                           'data' => $response->data,
+                       ];
+                       $response->statusCode = 401;
+                   }else {
+                       $response->data = [
+                           'success' => $response->isSuccessful,
+                           'data' => $response->data,
+                       ];
+                       $response->statusCode = 201;
+                   }
+
+                }else {
+                    $response->statusCode = 400;
+                    $response->data = [
+                        'success' => !$response->isSuccessful,
+                        'data' => $response->data,
+                    ];
+                }
+            },
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'secret key',

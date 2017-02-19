@@ -94,14 +94,15 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     }
     public static function auth($username,$password){
         if($user=self::findByUsername($username)){
-            if($user->password===Yii::$app->getSecurity()->generatePasswordHash($password)){
+            if(Yii::$app->getSecurity()->validatePassword($password, $user->password)
+            ){
                 $user->token=Yii::$app->getSecurity()->generateRandomString(20);
                 $user->save();
                 return ['message'=>'sign in success!!!','token'=>$user->token,'username'=>$user->username];
             }
-            return ['error'=>'Invalid password.'];
+            return ['auth error'=>'Invalid password.'];
         }
-        return ['error'=>'Username doesn\'t exist.Please sign up first.'];
+        return ['auth error'=>'Username doesn\'t exist.Please sign up first.'];
     }
     public function resetPassword($password){
         $this->password=Yii::$app->getSecurity()->generatePasswordHash($password);

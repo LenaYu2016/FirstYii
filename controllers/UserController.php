@@ -77,11 +77,15 @@ class UserController extends ActiveController
    public function reset($token,$fields){
        $user=User::findIdentityByAccessToken($token);
        $resps=[];
-       foreach($fields as $index=>$field){
-           $func='reset'.ucfirst($index);
-           $resps[$index]=$this->$func($user,$field);
+       if($user) {
+           foreach ($fields as $index => $field) {
+               $func = 'reset' . ucfirst($index);
+               $resps[$index] = $this->$func($user, $field);
+           }
+           return $resps;
+       }else {
+           return ['auth error' => 'Invalid token'];
        }
-      return isset($user)?$resps : ['error'=>'Invalid token'];
 
    }
     public function resetPassword($user,$password){
